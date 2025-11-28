@@ -41,9 +41,9 @@ jobs:
         with:
           label: "Jekyll CI/CD"
           sync-dir: "_site"
-          github-actor: "github-actions[bot]"
+          github-actor: ${{ secrets.GITHUB_ACTOR }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pages-repository: "yourusername/your-pages-repo"
+          pages-repository: ${{ secrets.GITHUB_REPOSITORY }}
           pages-branch: "gh-pages"
 ```
 
@@ -56,9 +56,9 @@ jobs:
           label: "Jekyll + Extras"
           sync-dir: "_site"
           copy-dir: "_extras"  # robots.txt, sitemap.xml, etc.
-          github-actor: "github-actions[bot]"
+          github-actor: ${{ secrets.GITHUB_ACTOR }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pages-repository: "yourusername/your-pages-repo"
+          pages-repository: ${{ secrets.GITHUB_REPOSITORY }}
           telegram-bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           telegram-user-id: ${{ secrets.TELEGRAM_USER_ID }}
 ```
