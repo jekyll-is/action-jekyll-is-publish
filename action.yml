@@ -45,8 +45,10 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
+        ACTOR=${INPUT_GITHUB_ACTOR:-github-actions[bot]}
+        echo "Actor: ${ACTOR}"
         BRANCH=${INPUT_PAGES_BRANCH:-gh-pages}
-        git config --global url."https://${INPUT_GITHUB_ACTOR}:${INPUT_GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+        git config --global url."https://${ACTOR}:${INPUT_GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
         git clone --branch ${BRANCH} --single-branch ${INPUT_PAGES_REPOSITORY} gh-pages
         if [ -n "$INPUT_SYNC_DIR" ]; then
           rsync -a --delete --exclude='.git/' "$INPUT_SYNC_DIR/" "gh-pages/"
@@ -55,8 +57,8 @@ runs:
           rsync -a --exclude='.git/' "$INPUT_COPY_DIR/" "gh-pages/"
         fi
         cd gh-pages
-        git config user.name "${INPUT_GITHUB_ACTOR}"
-        git config user.email "${INPUT_GITHUB_ACTOR}@users.noreply.github.com"
+        git config user.name "${ACTOR}"
+        git config user.email "${ACTOR}@users.noreply.github.com"
         git add .
         if git diff --cached --quiet; then
           echo "No changes. Nothing to do."
