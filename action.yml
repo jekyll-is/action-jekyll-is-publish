@@ -43,30 +43,38 @@ runs:
       run: sudo apt-get update && sudo apt-get install -y rsync
     - name: Fetch, Update & Publish
       shell: bash
+      env:
+        LABEL: ${{ inputs.label }}
+        SYNC_DIR: ${{ inputs.sync-dir }}
+        COPY_DIR: ${{ inputs.copy-dir }}
+        GH_ACTOR: ${{ inputs.github-actor }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        PGS_REPO: ${{ inputs.pages-repository }}
+        PGS_BRANCH: ${{ inputs.pages-branch }}
+        TG_TOKEN: ${{ inputs.telegram-bot-token }}
+        TG_USER_ID: ${{ inputs.telegram-user-id }}
       run: |
         set -euo pipefail
-        ACTOR=${INPUT_GITHUB_ACTOR:-github-actions[bot]}
-        echo "Actor: ${ACTOR}"
-        BRANCH=${INPUT_PAGES_BRANCH:-gh-pages}
-        git config --global url."https://${ACTOR}:${INPUT_GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-        git clone --branch ${BRANCH} --single-branch ${INPUT_PAGES_REPOSITORY} gh-pages
-        if [ -n "$INPUT_SYNC_DIR" ]; then
-          rsync -a --delete --exclude='.git/' "$INPUT_SYNC_DIR/" "gh-pages/"
+        BRANCH=${PGS_BRANCH:-gh-pages}
+        git config --global url."https://${GH_ACTOR}:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+        git clone --branch ${BRANCH} --single-branch ${PGS_REPO} gh-pages
+        if [ -n "$SYNC_DIR" ]; then
+          rsync -a --delete --exclude='.git/' "$SYNC_DIR/" "gh-pages/"
         fi
-        if [ -n "$INPUT_COPY_DIR" ]; then
-          rsync -a --exclude='.git/' "$INPUT_COPY_DIR/" "gh-pages/"
+        if [ -n "$COPY_DIR" ]; then
+          rsync -a --exclude='.git/' "$COPY_DIR/" "gh-pages/"
         fi
         cd gh-pages
-        git config user.name "${ACTOR}"
-        git config user.email "${ACTOR}@users.noreply.github.com"
+        git config user.name "${GH_ACTOR}"
+        git config user.email "${GH_ACTOR}@users.noreply.github.com"
         git add .
         if git diff --cached --quiet; then
           echo "No changes. Nothing to do."
         else
-          MSG="Publishing by ${INPUT_LABEL} @ $(date)"
+          MSG="Publishing by ${LABEL} @ $(date)"
           git commit -m "$MSG"
-          git push --force ${INPUT_PAGES_REPOSITORY} ${BRANCH}:${BRANCH}
-          if [ -n "$INPUT_TELEGRAM_BOT_TOKEN" ] && [ -n "$INPUT_TELEGRAM_USER_ID" ]; then
+          git push --force ${PGS_REPO} ${BRANCH}:${BRANCH}
+          if [ -n "$TG_TOKEN" ] && [ -n "$TG_USER_ID" ]; then
             NEWLINE=$'\n'
             SHOW=$(git show --pretty="" --name-status HEAD)
             SHOW_LINES=$(echo "$SHOW" | wc -l)
@@ -74,7 +82,7 @@ runs:
               SHOW="$(echo "$SHOW" | head -20)$NEWLINE..."
             fi
             TEXT=$(echo "${MSG}${NEWLINE}${NEWLINE}${SHOW_LINES} file(-s) changed:${NEWLINE}```git${NEWLINE}${SHOW}${NEWLINE}```${NEWLINE}" | sed 's/\\/\\\\/g; s/"/\\"/g; s/[_*[\]()~`>#+\-=|{}.!]/\\&/g')
-            JSON="{\"chat_id\":\"$INPUT_TELEGRAM_USER_ID\",\"text\":\"$TEXT\",\"parse_mode\":\"MarkdownV2\"}"
-            curl -X POST "https://api.telegram.org/bot${INPUT_TELEGRAM_BOT_TOKEN}/sendMessage" -H "Content-Type: application/json" -d "${JSON}"
+            JSON="{\"chat_id\":\"$TG_USER_ID\",\"text\":\"$TEXT\",\"parse_mode\":\"MarkdownV2\"}"
+            curl -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" -H "Content-Type: application/json" -d "${JSON}"
           fi
         fi
