@@ -82,7 +82,7 @@ runs:
             if [ "$SHOW_LINES" -gt 20 ]; then
               SHOW="$(echo "$SHOW" | head -20)$NEWLINE..."
             fi
-            TEXT=$(echo "${MSG}${NEWLINE}${NEWLINE}${SHOW_LINES} file\(-s\) changed:${NEWLINE}\`\`\`git${NEWLINE}${SHOW}${NEWLINE}\`\`\`${NEWLINE}" | sed 's/\\/\\\\/g; s/"/\\"/g; s/[_*[\]()~`>#+\-=|{}.!]/\\&/g')
+            TEXT=$(echo "${MSG}${NEWLINE}${NEWLINE}${SHOW_LINES} file\(\-s\) changed:${NEWLINE}\`\`\`git${NEWLINE}${SHOW}${NEWLINE}\`\`\`${NEWLINE}" | sed 's/\\/\\\\/g; s/"/\\"/g; s/[_*[\]()~`>#+\-=|{}.!]/\\&/g')
             JSON="{\"chat_id\":\"$TG_USER_ID\",\"text\":\"$TEXT\",\"parse_mode\":\"MarkdownV2\"}"
             curl -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" -H "Content-Type: application/json" -d "${JSON}"
           fi
