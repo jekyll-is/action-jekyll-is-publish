@@ -1,2 +1,2 @@
-# action-jekyll-publish
-Service action for build and deploy Jekyll site
+# action-jekyll-is-publish
+Service action for deploy Jekyll site
