@@ -1,5 +1,7 @@
 # Jekyll IS Publisher
 
+[![GitHub License](https://img.shields.io/github/license/jekyll-is/action-jekyll-is-publish)](LICENSE)
+
 **Jekyll IS Publisher** is a secure, composite GitHub Action for publishing pre-built Jekyll websites (or individual files) to GitHub Pages. It supports full directory synchronization, additional file copying, and optional Telegram notifications with detailed Git change logs.
 
 ## Features
