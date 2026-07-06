@@ -66,6 +66,7 @@ runs:
           rsync -a --exclude='.git/' "$COPY_DIR/" "gh-pages/"
         fi
         cd gh-pages
+        touch .nojekyll
         git config user.name "${GH_ACTOR}"
         git config user.email "${GH_ACTOR}@users.noreply.github.com"
         git add .
